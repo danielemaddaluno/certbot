@@ -8,7 +8,11 @@ You can read more about it here: https://www.joncom.be/projects/docker-nginx-let
 - Ensure docker and docker compose are installed on your server.
 - Run the following line to copy the `certbot.py` and `certbot.json` files from this repo to your server.
   ```
-  curl -OO https://raw.githubusercontent.com/joncombe/docker-nginx-letsencrypt-setup/main/{certbot.json,certbot.py}
+  curl -L -O https://github.com/danielemaddaluno/docker-nginx-letsencrypt-setup/archive/main.zip
+  unzip master.zip -d ./
+  cd certbot
+  mv * ../
+  cd ..
   ```
 - Edit `certbot.json`. You likely only need to edit the `domain` and `email` values.
 - Run the script:

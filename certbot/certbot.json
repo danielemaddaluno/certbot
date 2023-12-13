@@ -3,5 +3,5 @@
   "email": "certbot@example.com",
   "legacy_compose": false,
   "nginx_image": "nginx:1.23.4-alpine",
-  "volume_prefix": "./data"
+  "volume_prefix": "./"
 }

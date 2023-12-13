@@ -23,15 +23,15 @@ services:
       - 443:443
     restart: always
     volumes:
-      - [VOLUME_PREFIX]/certbot/conf/:/etc/nginx/ssl/:ro
-      - [VOLUME_PREFIX]/certbot/www:/var/www/certbot/:ro
+      - [VOLUME_PREFIX]/conf/:/etc/nginx/ssl/:ro
+      - [VOLUME_PREFIX]/www:/var/www/certbot/:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
   certbot:
     image: certbot/certbot:latest
     volumes:
-      - [VOLUME_PREFIX]/certbot/conf/:/etc/letsencrypt/:rw
-      - [VOLUME_PREFIX]/certbot/www/:/var/www/certbot/:rw"""
+      - [VOLUME_PREFIX]/conf/:/etc/letsencrypt/:rw
+      - [VOLUME_PREFIX]/www/:/var/www/certbot/:rw"""
 
 LETSENCRYPT_TEMPLATE = "[COMPOSE] run --rm  certbot certonly --webroot --webroot-path /var/www/certbot/ [DRYRUN] -d [DOMAIN] --non-interactive --agree-tos -m [EMAIL]"
 
@@ -146,15 +146,23 @@ class DockerNginxLetsEncryptSetup:
         )
 
     def setup(self):
-        self.stop_docker()
+        self.stop_docker_outside()
         self.write_docker_compose_yml()
         self.write_pre_nginx_conf()
         self.start_docker()
         self.get_certificate(dry_run=False)
         self.stop_docker()
-        self.write_post_nginx_conf()
-        self.start_docker()
+        # self.write_post_nginx_conf()
+        self.start_docker_outside()
         self.cleanup()
+
+    def start_docker_outside(self):
+        if os.path.exists("../docker-compose.yml"):
+            os.system(f"{self.compose(False)} -f ../docker-compose.yml up -d")
+
+    def stop_docker_outside(self):
+        if os.path.exists("../docker-compose.yml"):
+            os.system(f"{self.compose(False)} -f ../docker-compose.yml down")
 
     def start_docker(self):
         os.system(f"{self.compose(False)} up -d")
